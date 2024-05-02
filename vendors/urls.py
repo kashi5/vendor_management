@@ -1,6 +1,16 @@
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from vendors.views import UserRegistrationAPIView, VendorViewSet
+from vendors.views import PurchaseOrderViewSet
+from rest_framework.authtoken.views import obtain_auth_token
 
-from django.urls import path
+
+router = DefaultRouter()
+router.register(r'vendors', VendorViewSet)
+router.register(r'purchase_orders', PurchaseOrderViewSet)
 
 urlpatterns = [
-    path('api/vendors', vendors_list, name="Vendors List"),
+    path('', include(router.urls)),
+    path('token/', obtain_auth_token, name='api_token_auth'),
+    path('register/', UserRegistrationAPIView.as_view(), name='user_registration'),
 ]
