@@ -23,13 +23,13 @@ class Vendor(models.Model):
     class Meta:
         db_table = "vendor"
 
-    def update_vendor_performance(self):
+    def add_vendor_performance(self):
         VendorPerformance.objects.create(
             vendor_id=self,
-            on_time_delivery_rate= self.on_time_delivery_rate,
-            quality_rating_avg = self.quality_rating_avg,
-            average_response_time = self.average_response_time,
-            fulfillment_rate = self.fulfillment_rate,    
+            on_time_delivery_rate=self.on_time_delivery_rate,
+            quality_rating_avg=self.quality_rating_avg,
+            average_response_time=self.average_response_time,
+            fulfillment_rate=self.fulfillment_rate,
         )
 
 
@@ -39,9 +39,9 @@ class Vendor(models.Model):
 class PurchaseOrder(models.Model):
 
     STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('completed', 'Completed'),
-        ('cancelled', 'Cancelled'),
+        ("pending", "Pending"),
+        ("completed", "Completed"),
+        ("cancelled", "Cancelled"),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -52,7 +52,9 @@ class PurchaseOrder(models.Model):
     )
     items = models.JSONField(blank=False, null=False)
     quantity = models.IntegerField(blank=False, null=False)
-    status = models.CharField(max_length=80, blank=False, null=False, choices=STATUS_CHOICES)
+    status = models.CharField(
+        max_length=80, blank=False, null=False, choices=STATUS_CHOICES
+    )
     order_date = models.DateTimeField()
     delivery_date = models.DateTimeField()
     delivered_date = models.DateTimeField(null=True)
@@ -62,6 +64,26 @@ class PurchaseOrder(models.Model):
 
     class Meta:
         db_table = "purchase_order"
+
+
+"""This model is used to store the Vendor Metrics"""
+
+
+class VendorMetrics(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
+    vendor_id = models.ForeignKey(
+        Vendor, blank=False, null=False, on_delete=models.CASCADE
+    )
+    completed_orders = models.IntegerField(blank=False, null=False, default=0)
+    total_orders = models.IntegerField(blank=False, null=False, default=0)
+    quality_rating_count = models.IntegerField(blank=False, null=False, default=0)
+    acknowledgement_count = models.IntegerField(blank=False, null=False, default=0)
+    on_time_delivery_count = models.IntegerField(blank=False, null=False, default=0)
+
+    class Meta:
+        db_table = "vendor_metrics"
 
 
 """This model is used to store the Performance Details"""
@@ -83,8 +105,8 @@ class VendorPerformance(models.Model):
         db_table = "vendor_performance"
 
 
-
-# Model Signals for Vendor Model 
-@receiver(post_save, sender = Vendor)  
-def update_vendor_performance(sender, instance, **kwargs):
-  instance.update_vendor_performance()
+# Model Signals for Vendor Model
+@receiver(post_save, sender=Vendor)
+def update_vendor_performance(sender, instance, created, **kwargs):
+    if created:
+        instance.add_vendor_performance()
