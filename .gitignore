@@ -1,3 +1,4 @@
 .env
 env/
-vendores/*
+vendors/__pycache__
+vendor_management/__pycache__
