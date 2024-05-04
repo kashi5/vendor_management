@@ -4,7 +4,8 @@ from vendors.models import PurchaseOrder, Vendor
 class VendorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vendor
-        exclude = ['on_time_delivery_rate', 'quality_rating_avg', 'average_response_time','fulfillment_rate']
+        fields = '__all__'
+        # exclude = ['on_time_delivery_rate', 'quality_rating_avg', 'average_response_time','fulfillment_rate']
 
 
 class VendorPerformaceSerializer(serializers.ModelSerializer):

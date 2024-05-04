@@ -25,7 +25,7 @@ class Vendor(models.Model):
 
     def add_vendor_performance(self):
         VendorPerformance.objects.create(
-            vendor_id=self,
+            vendor=self,
             on_time_delivery_rate=self.on_time_delivery_rate,
             quality_rating_avg=self.quality_rating_avg,
             average_response_time=self.average_response_time,
@@ -47,7 +47,7 @@ class PurchaseOrder(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
-    vendor_id = models.ForeignKey(
+    vendor = models.ForeignKey(
         Vendor, blank=False, null=False, on_delete=models.CASCADE
     )
     items = models.JSONField(blank=False, null=False)
@@ -73,13 +73,14 @@ class VendorMetrics(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
-    vendor_id = models.ForeignKey(
+    vendor = models.ForeignKey(
         Vendor, blank=False, null=False, on_delete=models.CASCADE
     )
     completed_orders = models.IntegerField(blank=False, null=False, default=0)
     total_orders = models.IntegerField(blank=False, null=False, default=0)
     quality_rating_count = models.IntegerField(blank=False, null=False, default=0)
-    acknowledgement_count = models.IntegerField(blank=False, null=False, default=0)
+    total_acknowledgement_count = models.IntegerField(blank=False, null=False, default=0)
+    total_acknowledgement_rate  = models.FloatField(blank=False, null=False, default=0.0)
     on_time_delivery_count = models.IntegerField(blank=False, null=False, default=0)
 
     class Meta:
@@ -93,7 +94,7 @@ class VendorPerformance(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
-    vendor_id = models.ForeignKey(
+    vendor = models.ForeignKey(
         Vendor, blank=False, null=False, on_delete=models.CASCADE
     )
     on_time_delivery_rate = models.FloatField(blank=False, null=False)
@@ -110,3 +111,11 @@ class VendorPerformance(models.Model):
 def update_vendor_performance(sender, instance, created, **kwargs):
     if created:
         instance.add_vendor_performance()
+    else:
+        print("Updating Vendor Performance")
+        VendorPerformance.objects.create(
+            vendor= instance,
+            on_time_delivery_rate=instance.on_time_delivery_rate,
+            quality_rating_avg=instance.quality_rating_avg,
+            average_response_time=instance.average_response_time,
+            fulfillment_rate=instance.fulfillment_rate)

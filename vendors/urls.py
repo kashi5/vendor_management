@@ -16,7 +16,7 @@ router.register(r"purchase_orders", PurchaseOrderViewSet)
 urlpatterns = [
     path("", include(router.urls)),
     path(
-        "vendors/<uuid:vendor_id>/performance/",
+        "vendors/<uuid:vendor>/performance/",
         VendorPerformanceViewSet.as_view({"get": "retrieve"}),
         name="vendor-performance-detail",
     ),
