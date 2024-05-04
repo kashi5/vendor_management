@@ -14,8 +14,10 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from drf_spectacular.utils import extend_schema,OpenApiResponse
+from drf_spectacular.utils import extend_schema,OpenApiResponse,OpenApiParameter,extend_schema_view
 from rest_framework.authtoken.views import obtain_auth_token
+from datetime import datetime
+from drf_spectacular.types import OpenApiTypes
 
 
 @extend_schema(
@@ -107,8 +109,7 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
         if vendor_id:
             self.queryset = self.queryset.filter(vendor=vendor_id)
         return self.queryset
-
-
+    
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -141,7 +142,7 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         if (
-            serializer.validated_data["status"] == "Completed"
+            serializer.validated_data["status"] == "completed"
             and serializer.validated_data["quality_rating"] is None
             or not instance.acknowledgement_date
         ):
@@ -188,6 +189,10 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
 
 
 class VendorPerformanceViewSet(viewsets.ModelViewSet):
+    """
+    Serializer class for the VendorPerformance model.
+    """
+    serializer_class = VendorPerformaceSerializer  
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     def retrieve(self, request, pk=None, vendor_id=None):
@@ -208,8 +213,10 @@ class PurchaseOrderAcknowledgeViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         try:
             po_obj = PurchaseOrder.objects.get(id=kwargs["id"])
-            if not po_obj.acknowledgement_date:
-                po_obj.acknowledgement_date = timezone.now()
+            acknowledgement_timestamp = request.data.get('acknowledgement_date')
+            acknowledgement_datetime = datetime.strptime(acknowledgement_timestamp, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.get_default_timezone())
+            if not po_obj.acknowledgement_date and acknowledgement_datetime >= po_obj.issue_date:
+                po_obj.acknowledgement_date = acknowledgement_datetime
                 po_obj.save()
                 vendor_obj = po_obj.vendor_id
                 vendor_metric_obj = VendorMetrics.objects.get(vendor_id=vendor_obj)
@@ -230,8 +237,10 @@ class PurchaseOrderAcknowledgeViewSet(viewsets.ModelViewSet):
                     2,
                 )
                 vendor_obj.save()
-            serializer = PurchaseOrderAcknowledgeSerializer(po_obj)
-            return Response(serializer.data)
+                serializer = PurchaseOrderAcknowledgeSerializer(po_obj)
+                return Response(serializer.data)
+            else:
+                return Response("Acknowledgement date is already set or issue date is greater than acknowledgement date",status=status.HTTP_400_BAD_REQUEST)
         except PurchaseOrder.DoesNotExist:
             return Response("Purchase order not avaialable",status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
