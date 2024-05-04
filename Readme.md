@@ -5,8 +5,9 @@ This module is used to manage vendors, there purchase orders and vendor performa
 ### Stack
 - Language - Python 3.10
 - Backend Framework - Django rest framework
+- Database - PostgreSQL
 
-# Installation
+# Installation 💿
  - Install docker on you system if it is not installed.
   - https://docs.docker.com/get-docker/
   - https://docs.docker.com/compose/install/
