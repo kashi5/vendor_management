@@ -2,3 +2,4 @@
 env/
 vendors/__pycache__
 vendor_management/__pycache__
+__pycache__/

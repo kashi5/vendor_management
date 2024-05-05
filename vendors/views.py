@@ -103,19 +103,19 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
     serializer_class = PurchaseOrderSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-
+    
     def get_queryset(self):
         vendor_id = self.request.query_params.get("vendor_id")
         if vendor_id:
-            self.queryset = self.queryset.filter(vendor=vendor_id)
+            self.queryset = self.queryset.filter(vendor_id=vendor_id)
         return self.queryset
     
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         # Then save the instance
-        serializer.save()
-        vendor_obj = Vendor.objects.get(id=serializer.data["vendor_id"])
+        po_obj = serializer.save()
+        vendor_obj = po_obj.vendor_id
 
         # Vendor logic for metrics
         try:
@@ -168,9 +168,10 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
             )
             vendor_metric_obj.save()
 
-            vendor_obj.quality_rating_avg = (
+            vendor_obj.quality_rating_avg = round(
                 vendor_metric_obj.quality_rating_count
                 / vendor_metric_obj.completed_orders
+                ,2
             )
             vendor_obj.fulfillment_rate = round(
                 vendor_metric_obj.completed_orders

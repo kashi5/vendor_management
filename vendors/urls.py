@@ -12,7 +12,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 router = DefaultRouter()
 router.register(r"vendors", VendorViewSet)
-router.register(r"purchase_orders", PurchaseOrderViewSet)
+router.register(r"purchase_orders", PurchaseOrderViewSet, basename="purchase-order")
 
 urlpatterns = [
     path("", include(router.urls)),
