@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'vendor_management.wsgi.application'
 DATABASES = {
     'default': {
                 'ENGINE': 'django.db.backends.postgresql',
-                'HOST': 'localhost',
+                'HOST': 'db',
                 'PORT': 5432,
                 'NAME': os.environ.get('POSTGRES_NAME'),
                 'USER': os.environ.get('POSTGRES_USER'),
