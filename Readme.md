@@ -8,6 +8,12 @@ This module is used to manage vendors, there purchase orders and vendor performa
 - Database - PostgreSQL
 
 ## Pre-requisites
+- clone the git repository
+
+    ```bash
+    git clone https://github.com/kashi5/vendor_management.git
+    ```
+
 -  Install docker on you system if it is not installed.
 - https://docs.docker.com/get-docker/
 - https://docs.docker.com/compose/install/
@@ -15,6 +21,11 @@ This module is used to manage vendors, there purchase orders and vendor performa
 
 # Installation 💿
 - Follow the steps in a chronological order to access the APIs
+- Enter the project root folder
+    ```bash
+    cd vendor_management
+    ```
+
 - To run the docker, build the image for any changes
     ```bash
     docker-compose build
@@ -25,7 +36,7 @@ This module is used to manage vendors, there purchase orders and vendor performa
     docker-compose up -d
     ```
 
-- Run migrations
+- Wait for 3 or 4 minutes after the above command is run. Run database migrations
     ```bash
     docker-compose run --rm vendor python manage.py migrate
     ```
