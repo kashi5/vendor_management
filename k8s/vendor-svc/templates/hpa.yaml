@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "k8s.fullname" . }}
+  name: {{ include "vendor-svc.fullname" . }}
   labels:
-    {{- include "k8s.labels" . | nindent 4 }}
+    {{- include "vendor-svc.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "k8s.fullname" . }}
+    name: {{ include "vendor-svc.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
