@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: cricet/vendor-svc:0.5
+  repository: cricet/vendor-svc
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
@@ -38,7 +38,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 80
+  port: 8000
 
 ingress:
   enabled: false
@@ -80,3 +80,7 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+env:
+  - name: SECRET_KEY
+    value: "helloworld"
